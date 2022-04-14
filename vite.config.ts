@@ -10,7 +10,6 @@ interface Config extends UserConfig {
   };
 }
 
-// https://vitejs.dev/config/
 export default defineConfig({
   base: '/tasklist/',
   plugins: [react(), tsconfigPaths()],
