@@ -12,7 +12,7 @@ interface Config extends UserConfig {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/vite-react-starter/',
+  base: '/tasklist/',
   plugins: [react(), tsconfigPaths()],
   test: {
     globals: true,
