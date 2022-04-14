@@ -13,7 +13,7 @@ export const taskListApi = {
 
     return {
       create: (body: Task) => axios.post(`${apiUrl}/tasks`, body),
-      edit: (taskId: string, body: Task) => axios.put(`${apiUrl}/tasks/${taskId}`, body),
+      update: (taskId: string, body: Task) => axios.put(`${apiUrl}/tasks/${taskId}`, body),
       delete: (taskId: string) => axios.delete(`${apiUrl}/tasks/${taskId}`),
     };
   },

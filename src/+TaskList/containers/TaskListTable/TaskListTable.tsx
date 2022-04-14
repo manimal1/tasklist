@@ -35,7 +35,7 @@ export const TaskListTable: FC<Props> = ({ taskList, isLoading, refetch }) => {
       is_complete: !task.is_complete,
     };
 
-    await taskListApi.taskAction().edit(task.id, body);
+    await taskListApi.taskAction().update(task.id, body);
     refetch();
   };
 

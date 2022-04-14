@@ -43,7 +43,7 @@ export const TaskForm: FC<Props> = ({ isFormOpen, refetch, setIsFormOpen, task =
       title,
     };
 
-    await taskListApi.taskAction().edit(task.id, body);
+    await taskListApi.taskAction().update(task.id, body);
     refetch();
     handleClose();
   };
