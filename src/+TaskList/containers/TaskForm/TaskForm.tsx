@@ -1,24 +1,35 @@
 import { FC, useState, Dispatch, SetStateAction, useEffect } from 'react';
-import { AxiosPromise } from 'axios';
 
 import { useAppSelector } from 'state/hooks';
 import { getUserId } from 'state/_slices/userSlice';
-import { Task, TaskList } from '+TaskList/types';
+import { Task } from '+TaskList/types';
 import { taskListApi } from '+TaskList/services';
-import { formatTaskBody } from '+TaskList/utils';
+import { formatTaskBody, ActionType, Actions } from '+TaskList/utils';
 import { Drawer, Box, Button, TextField, Typography } from '@mui/material';
 
 interface Props {
-  refetch: () => AxiosPromise<TaskList>;
+  // refetch: () => AxiosPromise<TaskList>;
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
+  dispatch: Dispatch<ActionType>;
   isFormOpen: boolean;
   setIsFormOpen: Dispatch<SetStateAction<boolean>>;
   taskListCount?: number;
   task?: Task;
 }
 
-export const TaskForm: FC<Props> = ({ isFormOpen, refetch, setIsFormOpen, task = null, taskListCount = 0 }) => {
+export const TaskForm: FC<Props> = ({
+  setIsLoading,
+  isFormOpen,
+  dispatch,
+  // refetch,
+  setIsFormOpen,
+  task = null,
+  taskListCount = 0,
+}) => {
   const [title, setTitle] = useState<string>(task ? task.title : '');
   const userId = useAppSelector(getUserId);
+  // update task with custom hook using axios-hooks
+  // const { data, isLoading, updateTask: handleUpdateTask } = useUpdateTask({ taskId: task?.id, title, task });
 
   useEffect(() => {
     if (task) {
@@ -29,23 +40,31 @@ export const TaskForm: FC<Props> = ({ isFormOpen, refetch, setIsFormOpen, task =
   const handleClose = () => setIsFormOpen(false);
 
   const createTask = async () => {
+    setIsLoading(true);
     const body = formatTaskBody({ taskListCount, title, userId });
 
     await taskListApi.taskAction().create(body);
-    refetch();
+    dispatch({ type: Actions.CreateTask, payload: { task: body } });
+    // refetch();
     handleClose();
+    setIsLoading(false);
   };
 
   const updateTask = async () => {
     if (!task) return null;
+    setIsLoading(true);
     const body = {
       ...task,
       title,
     };
 
     await taskListApi.taskAction().update(task.id, body);
-    refetch();
+    // handleUpdateTask();
+
+    dispatch({ type: Actions.UpdateTask, payload: { task: body } });
+    // refetch();
     handleClose();
+    setIsLoading(false);
   };
 
   const renderTitle = () => (task ? 'Edit your task' : 'Create new task');

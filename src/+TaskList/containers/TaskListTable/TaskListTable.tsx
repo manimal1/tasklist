@@ -1,23 +1,25 @@
-import { FC, Fragment, useState } from 'react';
-import { AxiosPromise } from 'axios';
+import { FC, Fragment, useState, Dispatch, SetStateAction } from 'react';
 import { CircularProgress, Box, Typography, Checkbox, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import { Task, TaskList } from '+TaskList/types';
+import { Task } from '+TaskList/types';
 import { taskListApi } from '+TaskList/services';
 import { TaskForm } from '+TaskList/containers';
+import { Actions, ActionType } from '+TaskList/utils';
 
 interface Props {
   taskList: Task[];
   isLoading: boolean;
-  refetch: () => AxiosPromise<TaskList>;
+  dispatch: Dispatch<ActionType>;
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
+  // refetch: () => AxiosPromise<TaskList>;
 }
 
-export const TaskListTable: FC<Props> = ({ taskList, isLoading, refetch }) => {
+export const TaskListTable: FC<Props> = ({ taskList, isLoading, dispatch, setIsLoading }) => {
   const [taskInEdit, setTaskInEdit] = useState<Task | undefined>(undefined);
   const [isEditFormOpen, setIsEditFormOpen] = useState<boolean>(false);
-  if (!taskList) return null;
+  if (!taskList.length) return null;
 
   if (isLoading) {
     return (
@@ -36,7 +38,8 @@ export const TaskListTable: FC<Props> = ({ taskList, isLoading, refetch }) => {
     };
 
     await taskListApi.taskAction().update(task.id, body);
-    refetch();
+    dispatch({ type: Actions.UpdateTask, payload: { task: body } });
+    // refetch();
   };
 
   const editTask = (task: Task) => {
@@ -48,7 +51,7 @@ export const TaskListTable: FC<Props> = ({ taskList, isLoading, refetch }) => {
     taskListApi
       .taskAction()
       .delete(taskId)
-      .then(() => refetch());
+      .then(() => dispatch({ type: Actions.DeleteTask, payload: { taskId } }));
 
   return (
     <>
@@ -86,7 +89,13 @@ export const TaskListTable: FC<Props> = ({ taskList, isLoading, refetch }) => {
           </Box>
         </Fragment>
       ))}
-      <TaskForm task={taskInEdit} isFormOpen={isEditFormOpen} setIsFormOpen={setIsEditFormOpen} refetch={refetch} />
+      <TaskForm
+        task={taskInEdit}
+        dispatch={dispatch}
+        isFormOpen={isEditFormOpen}
+        setIsFormOpen={setIsEditFormOpen}
+        setIsLoading={setIsLoading}
+      />
     </>
   );
 };
