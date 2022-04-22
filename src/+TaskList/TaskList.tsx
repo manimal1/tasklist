@@ -2,13 +2,13 @@ import { FC, useState, useReducer, useEffect } from 'react';
 import { Divider, Box, IconButton, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/AddCircle';
 
+import { CenterCard } from 'components';
 import { taskListReducer, Actions } from '+TaskList/utils';
 import { Task } from '+TaskList/types';
 import { taskListApi } from './services';
 import { TaskListHeader, TaskListTable, TaskForm } from './containers';
 
 export const TaskList: FC = () => {
-  // const [{ data: taskListData, loading: isLoading }, refetch] = useTaskListApi('tasks/');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [state, dispatch] = useReducer(taskListReducer, { taskList: [] });
@@ -17,7 +17,7 @@ export const TaskList: FC = () => {
   useEffect(() => {
     const getTasks = async () => {
       setIsLoading(true);
-      const { data } = await taskListApi.taskAction().getAllTasks();
+      const { data } = await taskListApi.getAllTasks();
       dispatch({ type: Actions.SetInitialState, payload: { taskList: data as unknown as Task[] } });
       setIsLoading(false);
     };
@@ -40,13 +40,17 @@ export const TaskList: FC = () => {
   };
 
   return (
-    <>
+    <CenterCard>
       <TaskListHeader />
       <Divider />
-      <Box sx={{ maxHeight: '520px', overflow: 'scroll', paddingBottom: '48px' }}>
+      <Box sx={{ maxHeight: '520px', overflow: 'auto', paddingBottom: '48px' }}>
         <TaskListTable taskList={taskList} dispatch={dispatch} isLoading={false} setIsLoading={setIsLoading} />
       </Box>
-      <IconButton onClick={toggleDrawer} color="primary" sx={{ position: 'absolute', bottom: '0', right: '0' }}>
+      <IconButton
+        onClick={toggleDrawer}
+        color="primary"
+        sx={{ position: 'absolute', bottom: '0', right: '0', backgroundColor: 'white' }}
+      >
         <AddIcon fontSize="large" />
       </IconButton>
       <TaskForm
@@ -56,6 +60,6 @@ export const TaskList: FC = () => {
         taskListCount={taskList ? taskList.length : 0}
         dispatch={dispatch}
       />
-    </>
+    </CenterCard>
   );
 };
