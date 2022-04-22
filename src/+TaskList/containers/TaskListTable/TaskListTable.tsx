@@ -1,12 +1,11 @@
 import { FC, Fragment, useState, Dispatch, SetStateAction, SyntheticEvent } from 'react';
-import { CircularProgress, Box, Typography, Checkbox, IconButton } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { CircularProgress, Box } from '@mui/material';
 
 import { Task } from '+TaskList/types';
 import { taskListApi } from '+TaskList/services';
 import { TaskForm } from '+TaskList/containers';
 import { Actions, ActionType } from '+TaskList/utils';
+import { TaskListTableRow } from './components';
 
 interface Props {
   taskList: Task[];
@@ -50,39 +49,10 @@ export const TaskListTable: FC<Props> = ({ taskList, isLoading, dispatch, setIsL
     taskListApi.delete(taskId).then(() => dispatch({ type: Actions.DeleteTask, payload: { taskId } }));
 
   return (
-    <>
+    <Box sx={{ maxHeight: '520px', overflow: 'auto', paddingBottom: '48px' }}>
       {tasks.map((task) => (
         <Fragment key={task.id}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              minHeight: '48px',
-              borderBottom: '1px solid grey',
-              padding: '8px 12px',
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', flex: '1' }}>
-              <Checkbox checked={task.is_complete} onClick={(event: SyntheticEvent) => toggleCompleted(event, task)} />
-              <Typography variant="body1" sx={{ textDecoration: task.is_complete ? 'line-through' : 'none' }}>
-                {task.title}
-              </Typography>
-            </Box>
-            <Box>
-              <IconButton
-                aria-label="edit"
-                data-testid={`edit-${task.id}`}
-                onClick={() => editTask(task)}
-                color="secondary"
-              >
-                <EditIcon />
-              </IconButton>
-              <IconButton aria-label="delete" data-testid={`delete-${task.id}`} onClick={() => deleteTask(task.id)}>
-                <DeleteIcon />
-              </IconButton>
-            </Box>
-          </Box>
+          <TaskListTableRow task={task} toggleCompleted={toggleCompleted} editTask={editTask} deleteTask={deleteTask} />
         </Fragment>
       ))}
       <TaskForm
@@ -92,6 +62,6 @@ export const TaskListTable: FC<Props> = ({ taskList, isLoading, dispatch, setIsL
         setIsFormOpen={setIsEditFormOpen}
         setIsLoading={setIsLoading}
       />
-    </>
+    </Box>
   );
 };

@@ -43,9 +43,7 @@ export const TaskList: FC = () => {
     <CenterCard>
       <TaskListHeader />
       <Divider />
-      <Box sx={{ maxHeight: '520px', overflow: 'auto', paddingBottom: '48px' }}>
-        <TaskListTable taskList={taskList} dispatch={dispatch} isLoading={false} setIsLoading={setIsLoading} />
-      </Box>
+      <TaskListTable taskList={taskList} dispatch={dispatch} isLoading={false} setIsLoading={setIsLoading} />
       <IconButton
         onClick={toggleDrawer}
         color="primary"
