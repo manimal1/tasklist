@@ -1,4 +1,5 @@
 import { FC, useEffect, useState, Fragment } from 'react';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { Box, Typography, Tooltip, IconButton, Avatar, Menu, MenuItem, Divider, ListItemIcon } from '@mui/material';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
@@ -13,7 +14,9 @@ export const TaskListHeader: FC = () => {
   const userImage = useAppSelector(getUserImage);
 
   useEffect(() => {
-    dispatch(getUserData());
+    dispatch(getUserData())
+      .then(unwrapResult)
+      .catch((err) => console.error(err)); // eslint-disable-line
   }, [dispatch]);
 
   const open = Boolean(anchorEl);

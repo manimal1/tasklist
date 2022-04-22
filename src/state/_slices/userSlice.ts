@@ -15,12 +15,8 @@ const initialState: UserSlice = {
 };
 
 export const getUserData = createAsyncThunk('user/getUserData', async () => {
-  try {
-    const response = await axios.get('http://localhost:3001/user');
-    return response.data;
-  } catch (err) {
-    throw Error('There was an error retrieving the user');
-  }
+  const response = await axios.get('http://localhost:3001/tasklist/api/user');
+  return response.data;
 });
 
 export const userSlice = createSlice({

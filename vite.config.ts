@@ -11,7 +11,7 @@ interface Config extends UserConfig {
 }
 
 export default defineConfig({
-  base: '/',
+  base: '/tasklist/',
   plugins: [react(), tsconfigPaths()],
   test: {
     globals: true,

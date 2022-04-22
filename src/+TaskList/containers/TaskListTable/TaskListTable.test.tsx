@@ -6,7 +6,8 @@ import { store } from 'state/store';
 import { Task } from '+TaskList/types';
 import { TaskListTable } from './TaskListTable';
 
-const refetch = vi.fn();
+const dispatch = vi.fn();
+const setIsLoading = vi.fn();
 vi.mock('+TaskList/services', () => {
   return { taskAction: () => ({ delete: () => Promise.resolve() }) };
 });
@@ -19,7 +20,7 @@ const mockTaskList: Task[] = [
 const renderedTaskListTable = () =>
   render(
     <Provider store={store}>
-      <TaskListTable refetch={refetch} taskList={mockTaskList} isLoading={false} />
+      <TaskListTable taskList={mockTaskList} dispatch={dispatch} isLoading={false} setIsLoading={setIsLoading} />
     </Provider>,
   );
 
@@ -31,14 +32,14 @@ describe('<TaskListTable>', () => {
     expect(getByText('title 2'));
   });
 
-  test('displays delete button and handles its api query and refetch function', async () => {
+  test('displays delete button and handles its api query and dispatch function', async () => {
     vi.clearAllMocks();
     const { getByTestId } = renderedTaskListTable();
 
     expect(getByTestId('delete-1'));
     expect(getByTestId('delete-2'));
-    expect(refetch).toHaveBeenCalledTimes(0);
+    expect(dispatch).toHaveBeenCalledTimes(0);
     fireEvent.click(getByTestId('delete-1'));
-    waitFor(() => expect(refetch).toHaveBeenCalledTimes(1));
+    waitFor(() => expect(dispatch).toHaveBeenCalledTimes(1));
   });
 });

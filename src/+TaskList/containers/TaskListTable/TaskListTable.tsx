@@ -1,23 +1,24 @@
-import { FC, Fragment, useState } from 'react';
-import { AxiosPromise } from 'axios';
+import { FC, Fragment, useState, Dispatch, SetStateAction, SyntheticEvent } from 'react';
 import { CircularProgress, Box, Typography, Checkbox, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import { Task, TaskList } from '+TaskList/types';
+import { Task } from '+TaskList/types';
 import { taskListApi } from '+TaskList/services';
 import { TaskForm } from '+TaskList/containers';
+import { Actions, ActionType } from '+TaskList/utils';
 
 interface Props {
   taskList: Task[];
   isLoading: boolean;
-  refetch: () => AxiosPromise<TaskList>;
+  dispatch: Dispatch<ActionType>;
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
 }
 
-export const TaskListTable: FC<Props> = ({ taskList, isLoading, refetch }) => {
+export const TaskListTable: FC<Props> = ({ taskList, isLoading, dispatch, setIsLoading }) => {
   const [taskInEdit, setTaskInEdit] = useState<Task | undefined>(undefined);
   const [isEditFormOpen, setIsEditFormOpen] = useState<boolean>(false);
-  if (!taskList) return null;
+  if (!taskList.length) return null;
 
   if (isLoading) {
     return (
@@ -27,16 +28,17 @@ export const TaskListTable: FC<Props> = ({ taskList, isLoading, refetch }) => {
     );
   }
 
-  const tasks = taskList.sort((a, b) => a.created_at - b.created_at);
+  const tasks = taskList.sort((a, b) => b.created_at - a.created_at).sort((a) => (a.is_complete ? 0 : -1));
 
-  const toggleCompleted = async (task: Task) => {
+  const toggleCompleted = async (event: SyntheticEvent, task: Task) => {
+    event.preventDefault();
     const body = {
       ...task,
       is_complete: !task.is_complete,
     };
 
-    await taskListApi.taskAction().update(task.id, body);
-    refetch();
+    await taskListApi.update(task.id, body);
+    dispatch({ type: Actions.UpdateTask, payload: { task: body } });
   };
 
   const editTask = (task: Task) => {
@@ -45,10 +47,7 @@ export const TaskListTable: FC<Props> = ({ taskList, isLoading, refetch }) => {
   };
 
   const deleteTask = (taskId: string) =>
-    taskListApi
-      .taskAction()
-      .delete(taskId)
-      .then(() => refetch());
+    taskListApi.delete(taskId).then(() => dispatch({ type: Actions.DeleteTask, payload: { taskId } }));
 
   return (
     <>
@@ -65,7 +64,7 @@ export const TaskListTable: FC<Props> = ({ taskList, isLoading, refetch }) => {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', flex: '1' }}>
-              <Checkbox checked={task.is_complete} onClick={() => toggleCompleted(task)} />
+              <Checkbox checked={task.is_complete} onClick={(event: SyntheticEvent) => toggleCompleted(event, task)} />
               <Typography variant="body1" sx={{ textDecoration: task.is_complete ? 'line-through' : 'none' }}>
                 {task.title}
               </Typography>
@@ -86,7 +85,13 @@ export const TaskListTable: FC<Props> = ({ taskList, isLoading, refetch }) => {
           </Box>
         </Fragment>
       ))}
-      <TaskForm task={taskInEdit} isFormOpen={isEditFormOpen} setIsFormOpen={setIsEditFormOpen} refetch={refetch} />
+      <TaskForm
+        task={taskInEdit}
+        dispatch={dispatch}
+        isFormOpen={isEditFormOpen}
+        setIsFormOpen={setIsEditFormOpen}
+        setIsLoading={setIsLoading}
+      />
     </>
   );
 };
