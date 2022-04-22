@@ -1,2 +1,2 @@
-export * from './useTaskListApi';
+export * from './taskListApi';
 export * from './useUpdateTask';
