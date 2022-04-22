@@ -1,4 +1,4 @@
-import { FC, useState, Dispatch, SetStateAction, useEffect } from 'react';
+import { FC, useState, Dispatch, SetStateAction, useEffect, FormEvent } from 'react';
 
 import { useAppSelector } from 'state/hooks';
 import { getUserId } from 'state/_slices/userSlice';
@@ -8,7 +8,6 @@ import { formatTaskBody, ActionType, Actions } from '+TaskList/utils';
 import { Drawer, Box, Button, TextField, Typography } from '@mui/material';
 
 interface Props {
-  // refetch: () => AxiosPromise<TaskList>;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
   dispatch: Dispatch<ActionType>;
   isFormOpen: boolean;
@@ -28,8 +27,6 @@ export const TaskForm: FC<Props> = ({
 }) => {
   const [title, setTitle] = useState<string>(task ? task.title : '');
   const userId = useAppSelector(getUserId);
-  // update task with custom hook using axios-hooks
-  // const { data, isLoading, updateTask: handleUpdateTask } = useUpdateTask({ taskId: task?.id, title, task });
 
   useEffect(() => {
     if (task) {
@@ -43,9 +40,8 @@ export const TaskForm: FC<Props> = ({
     setIsLoading(true);
     const body = formatTaskBody({ taskListCount, title, userId });
 
-    await taskListApi.taskAction().create(body);
+    await taskListApi.create(body);
     dispatch({ type: Actions.CreateTask, payload: { task: body } });
-    // refetch();
     handleClose();
     setIsLoading(false);
   };
@@ -58,13 +54,15 @@ export const TaskForm: FC<Props> = ({
       title,
     };
 
-    await taskListApi.taskAction().update(task.id, body);
-    // handleUpdateTask();
-
+    await taskListApi.update(task.id, body);
     dispatch({ type: Actions.UpdateTask, payload: { task: body } });
-    // refetch();
     handleClose();
     setIsLoading(false);
+  };
+
+  const handleSubmitTask = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    task ? updateTask() : createTask();
   };
 
   const renderTitle = () => (task ? 'Edit your task' : 'Create new task');
@@ -75,7 +73,7 @@ export const TaskForm: FC<Props> = ({
         <Typography variant="h5" sx={{ mb: 4 }}>
           {renderTitle()}
         </Typography>
-        <form onSubmit={task ? updateTask : createTask}>
+        <form onSubmit={handleSubmitTask}>
           <TextField
             value={title}
             onChange={(e) => setTitle(e.target.value)}

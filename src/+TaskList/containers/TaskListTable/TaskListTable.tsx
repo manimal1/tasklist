@@ -1,4 +1,4 @@
-import { FC, Fragment, useState, Dispatch, SetStateAction } from 'react';
+import { FC, Fragment, useState, Dispatch, SetStateAction, SyntheticEvent } from 'react';
 import { CircularProgress, Box, Typography, Checkbox, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -13,7 +13,6 @@ interface Props {
   isLoading: boolean;
   dispatch: Dispatch<ActionType>;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
-  // refetch: () => AxiosPromise<TaskList>;
 }
 
 export const TaskListTable: FC<Props> = ({ taskList, isLoading, dispatch, setIsLoading }) => {
@@ -29,17 +28,17 @@ export const TaskListTable: FC<Props> = ({ taskList, isLoading, dispatch, setIsL
     );
   }
 
-  const tasks = taskList.sort((a, b) => a.created_at - b.created_at);
+  const tasks = taskList.sort((a, b) => b.created_at - a.created_at).sort((a) => (a.is_complete ? 0 : -1));
 
-  const toggleCompleted = async (task: Task) => {
+  const toggleCompleted = async (event: SyntheticEvent, task: Task) => {
+    event.preventDefault();
     const body = {
       ...task,
       is_complete: !task.is_complete,
     };
 
-    await taskListApi.taskAction().update(task.id, body);
+    await taskListApi.update(task.id, body);
     dispatch({ type: Actions.UpdateTask, payload: { task: body } });
-    // refetch();
   };
 
   const editTask = (task: Task) => {
@@ -48,10 +47,7 @@ export const TaskListTable: FC<Props> = ({ taskList, isLoading, dispatch, setIsL
   };
 
   const deleteTask = (taskId: string) =>
-    taskListApi
-      .taskAction()
-      .delete(taskId)
-      .then(() => dispatch({ type: Actions.DeleteTask, payload: { taskId } }));
+    taskListApi.delete(taskId).then(() => dispatch({ type: Actions.DeleteTask, payload: { taskId } }));
 
   return (
     <>
@@ -68,7 +64,7 @@ export const TaskListTable: FC<Props> = ({ taskList, isLoading, dispatch, setIsL
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', flex: '1' }}>
-              <Checkbox checked={task.is_complete} onClick={() => toggleCompleted(task)} />
+              <Checkbox checked={task.is_complete} onClick={(event: SyntheticEvent) => toggleCompleted(event, task)} />
               <Typography variant="body1" sx={{ textDecoration: task.is_complete ? 'line-through' : 'none' }}>
                 {task.title}
               </Typography>

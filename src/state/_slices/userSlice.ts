@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from 'state/store';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 interface UserSlice {
   id: string;
@@ -14,18 +14,9 @@ const initialState: UserSlice = {
   image_url: '',
 };
 
-export const getUserData = createAsyncThunk('user/getUserData', async (_, { rejectWithValue }) => {
+export const getUserData = createAsyncThunk('user/getUserData', async () => {
   const response = await axios.get('http://localhost:3001/tasklist/api/user');
   return response.data;
-  // try {
-  //   const response = await axios.get('http://localhost:3001/tasklist/api/user');
-  //   return response.data;
-  // } catch (err: unknown) {
-  //   if (!(err as AxiosError).response) {
-  //     throw new Error('There was an error retrieving the user');
-  //   }
-  //   return rejectWithValue((err as AxiosError).response?.data);
-  // }
 });
 
 export const userSlice = createSlice({
