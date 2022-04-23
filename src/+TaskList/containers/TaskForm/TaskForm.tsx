@@ -1,32 +1,24 @@
-import { FC, useState, Dispatch, SetStateAction, useEffect, FormEvent } from 'react';
+import { FC, useState, Dispatch, SetStateAction, useEffect, useTransition, FormEvent } from 'react';
 
 import { useAppSelector } from 'state/hooks';
 import { getUserId } from 'state/_slices/userSlice';
 import { Task } from '+TaskList/types';
 import { taskListApi } from '+TaskList/services';
 import { formatTaskBody, ActionType, Actions } from '+TaskList/utils';
-import { Drawer, Box, Button, TextField } from '@mui/material';
+import { Drawer, Box, Button, TextField, CircularProgress } from '@mui/material';
 
 interface Props {
   task: Task | null;
-  taskListCount?: number;
+  taskListCount: number;
   isFormOpen: boolean;
-  setIsLoading: Dispatch<SetStateAction<boolean>>;
   dispatch: Dispatch<ActionType>;
   setIsFormOpen: Dispatch<SetStateAction<boolean>>;
   setTaskInEdit: Dispatch<SetStateAction<Task | null>>;
 }
 
-export const TaskForm: FC<Props> = ({
-  task = null,
-  taskListCount = 0,
-  isFormOpen,
-  setIsLoading,
-  dispatch,
-  setIsFormOpen,
-  setTaskInEdit,
-}) => {
+export const TaskForm: FC<Props> = ({ task, taskListCount, isFormOpen, dispatch, setIsFormOpen, setTaskInEdit }) => {
   const [title, setTitle] = useState<string>(task ? task.title : '');
+  const [isLoading, startTransition] = useTransition();
   const userId = useAppSelector(getUserId);
 
   useEffect(() => {
@@ -39,31 +31,30 @@ export const TaskForm: FC<Props> = ({
     if (task) {
       setTaskInEdit(null);
     }
+    setTitle('');
     setIsFormOpen(false);
   };
 
   const createTask = async () => {
-    setIsLoading(true);
     const body = formatTaskBody({ taskListCount, title, userId });
 
-    await taskListApi.create(body);
-    dispatch({ type: Actions.CreateTask, payload: { task: body } });
-    handleClose();
-    setIsLoading(false);
+    startTransition(() => {
+      taskListApi.create(body).then(() => dispatch({ type: Actions.CreateTask, payload: { task: body } }));
+      handleClose();
+    });
   };
 
   const updateTask = async () => {
     if (!task) return null;
-    setIsLoading(true);
     const body = {
       ...task,
       title,
     };
 
-    await taskListApi.update(task.id, body);
-    dispatch({ type: Actions.UpdateTask, payload: { task: body } });
+    startTransition(() => {
+      taskListApi.update(task.id, body).then(() => dispatch({ type: Actions.UpdateTask, payload: { task: body } }));
+    });
     handleClose();
-    setIsLoading(false);
   };
 
   const handleSubmitTask = (event: FormEvent<HTMLFormElement>) => {
@@ -72,6 +63,7 @@ export const TaskForm: FC<Props> = ({
   };
 
   const renderLabel = () => (task ? 'Edit task' : 'Create task');
+  const renderButtonLabel = () => (task ? 'Update' : 'Create');
 
   return (
     <Drawer anchor="bottom" open={isFormOpen} onClose={handleClose}>
@@ -86,7 +78,9 @@ export const TaskForm: FC<Props> = ({
           >
             {title}
           </TextField>
-          <Button type="submit">{task ? 'Update' : 'Create'}</Button>
+          <Button type="submit">
+            {isLoading ? <CircularProgress sx={{ color: 'white', height: '32px !important' }} /> : renderButtonLabel()}
+          </Button>
         </Box>
       </form>
     </Drawer>

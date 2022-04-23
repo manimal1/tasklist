@@ -1,4 +1,4 @@
-import { FC, useState, useReducer, useEffect } from 'react';
+import { FC, useState, useReducer, useEffect, useTransition, useCallback } from 'react';
 import { Divider, Box, IconButton, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/AddCircle';
 
@@ -9,24 +9,23 @@ import { taskListApi } from './services';
 import { TaskListHeader, TaskListTable, TaskForm } from './containers';
 
 export const TaskList: FC = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [taskInEdit, setTaskInEdit] = useState<Task | null>(null);
+  const [isLoading, startTransition] = useTransition();
   const [state, dispatch] = useReducer(taskListReducer, { taskList: [] });
   const taskList = state.taskList;
 
-  useEffect(() => {
-    const getTasks = async () => {
-      setIsLoading(true);
-      const { data } = await taskListApi.getAllTasks();
+  const getTasks = useCallback(() => {
+    void taskListApi.getAllTasks().then(({ data }) => {
       dispatch({ type: Actions.SetInitialState, payload: { taskList: data as unknown as Task[] } });
-      setIsLoading(false);
-    };
+    });
+  }, []);
 
+  useEffect(() => {
     if (!taskList.length && !isLoading) {
-      getTasks();
+      startTransition(() => getTasks());
     }
-  }, [taskList, isLoading]);
+  }, [taskList, getTasks, isLoading]);
 
   if (isLoading) {
     return (
@@ -47,7 +46,6 @@ export const TaskList: FC = () => {
       <TaskListTable
         taskList={taskList}
         dispatch={dispatch}
-        isLoading={false}
         setTaskInEdit={setTaskInEdit}
         setIsFormOpen={setIsFormOpen}
       />
@@ -62,7 +60,6 @@ export const TaskList: FC = () => {
         task={taskInEdit}
         isFormOpen={isFormOpen}
         taskListCount={taskList ? taskList.length : 0}
-        setIsLoading={setIsLoading}
         dispatch={dispatch}
         setIsFormOpen={setIsFormOpen}
         setTaskInEdit={setTaskInEdit}

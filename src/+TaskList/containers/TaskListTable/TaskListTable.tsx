@@ -8,22 +8,13 @@ import { TaskListTableRow } from './components';
 
 interface Props {
   taskList: Task[];
-  isLoading: boolean;
   dispatch: Dispatch<ActionType>;
   setIsFormOpen: Dispatch<SetStateAction<boolean>>;
   setTaskInEdit: Dispatch<SetStateAction<Task | null>>;
 }
 
-export const TaskListTable: FC<Props> = ({ taskList, isLoading, dispatch, setIsFormOpen, setTaskInEdit }) => {
+export const TaskListTable: FC<Props> = ({ taskList, dispatch, setIsFormOpen, setTaskInEdit }) => {
   if (!taskList.length) return null;
-
-  if (isLoading) {
-    return (
-      <Box sx={{ display: 'flex' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
 
   const tasks = taskList.sort((a, b) => b.created_at - a.created_at).sort((a) => (a.is_complete ? 0 : -1));
 
