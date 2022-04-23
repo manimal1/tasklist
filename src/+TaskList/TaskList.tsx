@@ -11,6 +11,7 @@ import { TaskListHeader, TaskListTable, TaskForm } from './containers';
 export const TaskList: FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
+  const [taskInEdit, setTaskInEdit] = useState<Task | null>(null);
   const [state, dispatch] = useReducer(taskListReducer, { taskList: [] });
   const taskList = state.taskList;
 
@@ -23,7 +24,7 @@ export const TaskList: FC = () => {
     };
 
     if (!taskList.length && !isLoading) {
-      void getTasks();
+      getTasks();
     }
   }, [taskList, isLoading]);
 
@@ -43,7 +44,13 @@ export const TaskList: FC = () => {
     <CenterCard>
       <TaskListHeader />
       <Divider />
-      <TaskListTable taskList={taskList} dispatch={dispatch} isLoading={false} setIsLoading={setIsLoading} />
+      <TaskListTable
+        taskList={taskList}
+        dispatch={dispatch}
+        isLoading={false}
+        setTaskInEdit={setTaskInEdit}
+        setIsFormOpen={setIsFormOpen}
+      />
       <IconButton
         onClick={toggleDrawer}
         color="primary"
@@ -52,11 +59,13 @@ export const TaskList: FC = () => {
         <AddIcon fontSize="large" />
       </IconButton>
       <TaskForm
-        setIsLoading={setIsLoading}
-        setIsFormOpen={setIsFormOpen}
+        task={taskInEdit}
         isFormOpen={isFormOpen}
         taskListCount={taskList ? taskList.length : 0}
+        setIsLoading={setIsLoading}
         dispatch={dispatch}
+        setIsFormOpen={setIsFormOpen}
+        setTaskInEdit={setTaskInEdit}
       />
     </CenterCard>
   );

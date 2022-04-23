@@ -5,25 +5,26 @@ import { getUserId } from 'state/_slices/userSlice';
 import { Task } from '+TaskList/types';
 import { taskListApi } from '+TaskList/services';
 import { formatTaskBody, ActionType, Actions } from '+TaskList/utils';
-import { Drawer, Box, Button, TextField, Typography } from '@mui/material';
+import { Drawer, Box, Button, TextField } from '@mui/material';
 
 interface Props {
+  task: Task | null;
+  taskListCount?: number;
+  isFormOpen: boolean;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
   dispatch: Dispatch<ActionType>;
-  isFormOpen: boolean;
   setIsFormOpen: Dispatch<SetStateAction<boolean>>;
-  taskListCount?: number;
-  task?: Task;
+  setTaskInEdit: Dispatch<SetStateAction<Task | null>>;
 }
 
 export const TaskForm: FC<Props> = ({
-  setIsLoading,
-  isFormOpen,
-  dispatch,
-  // refetch,
-  setIsFormOpen,
   task = null,
   taskListCount = 0,
+  isFormOpen,
+  setIsLoading,
+  dispatch,
+  setIsFormOpen,
+  setTaskInEdit,
 }) => {
   const [title, setTitle] = useState<string>(task ? task.title : '');
   const userId = useAppSelector(getUserId);
@@ -34,7 +35,12 @@ export const TaskForm: FC<Props> = ({
     }
   }, [task]);
 
-  const handleClose = () => setIsFormOpen(false);
+  const handleClose = () => {
+    if (task) {
+      setTaskInEdit(null);
+    }
+    setIsFormOpen(false);
+  };
 
   const createTask = async () => {
     setIsLoading(true);
@@ -65,16 +71,14 @@ export const TaskForm: FC<Props> = ({
     task ? updateTask() : createTask();
   };
 
-  const renderTitle = () => (task ? 'Edit your task' : 'Create new task');
+  const renderLabel = () => (task ? 'Edit task' : 'Create task');
 
   return (
     <Drawer anchor="bottom" open={isFormOpen} onClose={handleClose}>
-      <Box sx={{ padding: '32px', textAlign: 'center' }}>
-        <Typography variant="h5" sx={{ mb: 4 }}>
-          {renderTitle()}
-        </Typography>
-        <form onSubmit={handleSubmitTask}>
+      <form onSubmit={handleSubmitTask}>
+        <Box sx={{ padding: '32px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
           <TextField
+            label={renderLabel()}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             variant="standard"
@@ -83,8 +87,8 @@ export const TaskForm: FC<Props> = ({
             {title}
           </TextField>
           <Button type="submit">{task ? 'Update' : 'Create'}</Button>
-        </form>
-      </Box>
+        </Box>
+      </form>
     </Drawer>
   );
 };

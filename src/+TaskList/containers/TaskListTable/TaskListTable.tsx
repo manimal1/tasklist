@@ -1,9 +1,8 @@
-import { FC, Fragment, useState, Dispatch, SetStateAction, SyntheticEvent } from 'react';
+import { FC, Fragment, Dispatch, SetStateAction, SyntheticEvent } from 'react';
 import { CircularProgress, Box } from '@mui/material';
 
 import { Task } from '+TaskList/types';
 import { taskListApi } from '+TaskList/services';
-import { TaskForm } from '+TaskList/containers';
 import { Actions, ActionType } from '+TaskList/utils';
 import { TaskListTableRow } from './components';
 
@@ -11,12 +10,11 @@ interface Props {
   taskList: Task[];
   isLoading: boolean;
   dispatch: Dispatch<ActionType>;
-  setIsLoading: Dispatch<SetStateAction<boolean>>;
+  setIsFormOpen: Dispatch<SetStateAction<boolean>>;
+  setTaskInEdit: Dispatch<SetStateAction<Task | null>>;
 }
 
-export const TaskListTable: FC<Props> = ({ taskList, isLoading, dispatch, setIsLoading }) => {
-  const [taskInEdit, setTaskInEdit] = useState<Task | undefined>(undefined);
-  const [isEditFormOpen, setIsEditFormOpen] = useState<boolean>(false);
+export const TaskListTable: FC<Props> = ({ taskList, isLoading, dispatch, setIsFormOpen, setTaskInEdit }) => {
   if (!taskList.length) return null;
 
   if (isLoading) {
@@ -42,7 +40,7 @@ export const TaskListTable: FC<Props> = ({ taskList, isLoading, dispatch, setIsL
 
   const editTask = (task: Task) => {
     setTaskInEdit(task);
-    setIsEditFormOpen(true);
+    setIsFormOpen(true);
   };
 
   const deleteTask = (taskId: string) =>
@@ -55,13 +53,6 @@ export const TaskListTable: FC<Props> = ({ taskList, isLoading, dispatch, setIsL
           <TaskListTableRow task={task} toggleCompleted={toggleCompleted} editTask={editTask} deleteTask={deleteTask} />
         </Fragment>
       ))}
-      <TaskForm
-        task={taskInEdit}
-        dispatch={dispatch}
-        isFormOpen={isEditFormOpen}
-        setIsFormOpen={setIsEditFormOpen}
-        setIsLoading={setIsLoading}
-      />
     </Box>
   );
 };
