@@ -20,28 +20,31 @@ export const TaskListRoute: FC = () => {
   const userName = useAppSelector(getUserName);
   const taskList = state.taskList;
 
-  const getTasks = useCallback(() => {
-    void taskListApi.getAllTasks().then(({ data }) => {
-      dispatch({ type: Actions.SetInitialState, payload: { taskList: data as unknown as Task[] } });
-    });
-  }, []);
-
   const getLoggedInUser = useCallback(() => {
     storeDispatch(getUserData())
       .then(unwrapResult)
       .catch((err) => console.error(err)); // eslint-disable-line
   }, [storeDispatch]);
 
-  // get initial user and tasklist data
+  // get initial user data
   useEffect(() => {
-    if (!userName) {
+    if (!userName && !isInitialDataLoading) {
       startTransition(() => getLoggedInUser());
     }
+  }, [userName, getLoggedInUser, isInitialDataLoading]);
 
+  const getTasks = useCallback(() => {
+    void taskListApi.getAllTasks().then(({ data }) => {
+      dispatch({ type: Actions.SetInitialState, payload: { taskList: data as unknown as Task[] } });
+    });
+  }, []);
+
+  // get initial tasklist data
+  useEffect(() => {
     if (!taskList.length && !isInitialDataLoading) {
       startTransition(() => getTasks());
     }
-  }, [userName, getLoggedInUser, taskList, getTasks, isInitialDataLoading, storeDispatch]);
+  }, [taskList, getTasks, isInitialDataLoading]);
 
   if (isInitialDataLoading) {
     return (
