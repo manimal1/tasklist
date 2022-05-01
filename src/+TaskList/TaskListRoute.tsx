@@ -1,14 +1,14 @@
 import { FC, useState, useReducer, useEffect, useTransition, useCallback } from 'react';
-import { Divider, Box, IconButton, CircularProgress } from '@mui/material';
+import { Box, Divider, IconButton, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/AddCircle';
 
-import { CenterCard } from 'components';
 import { taskListReducer, Actions } from '+TaskList/utils';
 import { Task } from '+TaskList/types';
 import { taskListApi } from './services';
 import { TaskListHeader, TaskListTable, TaskForm } from './containers';
+import { TasklistCard } from './components';
 
-export const TaskList: FC = () => {
+export const TaskListRoute: FC = () => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [taskInEdit, setTaskInEdit] = useState<Task | null>(null);
   const [isLoading, startTransition] = useTransition();
@@ -40,7 +40,7 @@ export const TaskList: FC = () => {
   };
 
   return (
-    <CenterCard>
+    <TasklistCard>
       <TaskListHeader />
       <Divider />
       <TaskListTable
@@ -52,7 +52,13 @@ export const TaskList: FC = () => {
       <IconButton
         onClick={toggleDrawer}
         color="primary"
-        sx={{ position: 'absolute', bottom: '0', right: '0', backgroundColor: 'white' }}
+        sx={{
+          position: 'absolute',
+          bottom: '0',
+          right: '0',
+          backgroundColor: 'white',
+          zIndex: '10',
+        }}
       >
         <AddIcon fontSize="large" />
       </IconButton>
@@ -64,6 +70,6 @@ export const TaskList: FC = () => {
         setIsFormOpen={setIsFormOpen}
         setTaskInEdit={setTaskInEdit}
       />
-    </CenterCard>
+    </TasklistCard>
   );
 };

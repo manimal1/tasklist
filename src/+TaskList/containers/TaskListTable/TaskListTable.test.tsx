@@ -7,9 +7,9 @@ import { Task } from '+TaskList/types';
 import { TaskListTable } from './TaskListTable';
 
 const dispatch = vi.fn();
-const setIsLoading = vi.fn();
+const mockFn = vi.fn();
 vi.mock('+TaskList/services', () => {
-  return { taskAction: () => ({ delete: () => Promise.resolve() }) };
+  return { taskListApi: { delete: () => Promise.resolve() } };
 });
 
 const mockTaskList: Task[] = [
@@ -20,7 +20,7 @@ const mockTaskList: Task[] = [
 const renderedTaskListTable = () =>
   render(
     <Provider store={store}>
-      <TaskListTable taskList={mockTaskList} dispatch={dispatch} isLoading={false} setIsLoading={setIsLoading} />
+      <TaskListTable taskList={mockTaskList} dispatch={dispatch} setIsFormOpen={mockFn} setTaskInEdit={mockFn} />
     </Provider>,
   );
 

@@ -1,5 +1,5 @@
 import { FC, Fragment, Dispatch, SetStateAction, SyntheticEvent } from 'react';
-import { CircularProgress, Box } from '@mui/material';
+import { Box } from '@mui/material';
 
 import { Task } from '+TaskList/types';
 import { taskListApi } from '+TaskList/services';
@@ -14,7 +14,9 @@ interface Props {
 }
 
 export const TaskListTable: FC<Props> = ({ taskList, dispatch, setIsFormOpen, setTaskInEdit }) => {
-  if (!taskList.length) return null;
+  if (!taskList.length) {
+    return null;
+  }
 
   const tasks = taskList.sort((a, b) => b.created_at - a.created_at).sort((a) => (a.is_complete ? 0 : -1));
 

@@ -66,19 +66,21 @@ export const TaskForm: FC<Props> = ({ task, taskListCount, isFormOpen, dispatch,
   const renderButtonLabel = () => (task ? 'Update' : 'Create');
 
   return (
-    <Drawer anchor="bottom" open={isFormOpen} onClose={handleClose}>
+    <Drawer anchor="bottom" open={isFormOpen} onClose={handleClose} variant="temporary">
       <form onSubmit={handleSubmitTask}>
-        <Box sx={{ padding: '32px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+        <Box
+          sx={{ padding: '32px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', flexWrap: 'wrap' }}
+        >
           <TextField
             label={renderLabel()}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             variant="standard"
-            sx={{ minWidth: '280px', marginRight: '24px' }}
+            sx={{ minWidth: '280px', marginRight: '24px', marginBottom: '12px' }}
           >
             {title}
           </TextField>
-          <Button type="submit">
+          <Button type="submit" sx={{ marginBottom: '12px' }}>
             {isLoading ? <CircularProgress sx={{ color: 'white', height: '32px !important' }} /> : renderButtonLabel()}
           </Button>
         </Box>
