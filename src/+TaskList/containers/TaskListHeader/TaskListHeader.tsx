@@ -1,23 +1,15 @@
-import { FC, useEffect, useState, Fragment } from 'react';
-import { unwrapResult } from '@reduxjs/toolkit';
+import { FC, useState, Fragment } from 'react';
 import { Box, Typography, Tooltip, IconButton, Avatar, Menu, MenuItem, Divider, ListItemIcon } from '@mui/material';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
 
-import { useAppDispatch, useAppSelector } from 'state/hooks';
-import { getUserData, getUserName, getUserImage } from 'state/_slices/userSlice';
+import { useAppSelector } from 'state/hooks';
+import { getUserName, getUserImage } from 'state/_slices/userSlice';
 
 export const TaskListHeader: FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const dispatch = useAppDispatch();
   const userName = useAppSelector(getUserName);
   const userImage = useAppSelector(getUserImage);
-
-  useEffect(() => {
-    dispatch(getUserData())
-      .then(unwrapResult)
-      .catch((err) => console.error(err)); // eslint-disable-line
-  }, [dispatch]);
 
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -29,7 +21,7 @@ export const TaskListHeader: FC = () => {
 
   return (
     <Fragment>
-      <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center', minHeight: '80px' }}>
         <Tooltip title="Account settings">
           <IconButton
             onClick={handleClick}

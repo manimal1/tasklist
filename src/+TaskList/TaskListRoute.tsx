@@ -1,7 +1,10 @@
 import { FC, useState, useReducer, useEffect, useTransition, useCallback } from 'react';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { Box, Divider, IconButton, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/AddCircle';
 
+import { useAppDispatch, useAppSelector } from 'state/hooks';
+import { getUserData, getUserName } from 'state/_slices/userSlice';
 import { taskListReducer, Actions } from '+TaskList/utils';
 import { Task } from '+TaskList/types';
 import { taskListApi } from './services';
@@ -11,8 +14,10 @@ import { TasklistCard } from './components';
 export const TaskListRoute: FC = () => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [taskInEdit, setTaskInEdit] = useState<Task | null>(null);
-  const [isLoading, startTransition] = useTransition();
+  const [isInitialDataLoading, startTransition] = useTransition();
   const [state, dispatch] = useReducer(taskListReducer, { taskList: [] });
+  const storeDispatch = useAppDispatch();
+  const userName = useAppSelector(getUserName);
   const taskList = state.taskList;
 
   const getTasks = useCallback(() => {
@@ -21,13 +26,24 @@ export const TaskListRoute: FC = () => {
     });
   }, []);
 
+  const getLoggedInUser = useCallback(() => {
+    storeDispatch(getUserData())
+      .then(unwrapResult)
+      .catch((err) => console.error(err)); // eslint-disable-line
+  }, [storeDispatch]);
+
+  // get initial user and tasklist data
   useEffect(() => {
-    if (!taskList.length && !isLoading) {
+    if (!userName) {
+      startTransition(() => getLoggedInUser());
+    }
+
+    if (!taskList.length && !isInitialDataLoading) {
       startTransition(() => getTasks());
     }
-  }, [taskList, getTasks, isLoading]);
+  }, [userName, getLoggedInUser, taskList, getTasks, isInitialDataLoading, storeDispatch]);
 
-  if (isLoading) {
+  if (isInitialDataLoading) {
     return (
       <Box sx={{ display: 'flex' }}>
         <CircularProgress />
