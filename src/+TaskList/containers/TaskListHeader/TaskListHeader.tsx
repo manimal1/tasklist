@@ -1,7 +1,8 @@
 import { FC, useState, Fragment } from 'react';
 import { Box, Typography, Tooltip, IconButton, Avatar, Menu, MenuItem, Divider, ListItemIcon } from '@mui/material';
-import Settings from '@mui/icons-material/Settings';
-import Logout from '@mui/icons-material/Logout';
+import SettingsIcon from '@mui/icons-material/Settings';
+import MenuIcon from '@mui/icons-material/MoreVert';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 import { useAppSelector } from 'state/hooks';
 import { getUserName, getUserImage } from 'state/_slices/userSlice';
@@ -21,7 +22,22 @@ export const TaskListHeader: FC = () => {
 
   return (
     <Fragment>
-      <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center', minHeight: '80px' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          minHeight: '80px',
+          pl: 3,
+          pr: 2,
+        }}
+      >
+        <Box display="flex">
+          <Avatar sx={{ width: 32, height: 32, mr: 2 }}>
+            <img src={userImage} style={{ width: 48, height: 32 }} />
+          </Avatar>
+          <Typography variant="h5">{`${userName}'s task list`}</Typography>
+        </Box>
         <Tooltip title="Account settings">
           <IconButton
             onClick={handleClick}
@@ -31,12 +47,9 @@ export const TaskListHeader: FC = () => {
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
           >
-            <Avatar sx={{ width: 32, height: 32 }}>
-              <img src={userImage} style={{ width: 48, height: 32 }} />
-            </Avatar>
+            <MenuIcon />
           </IconButton>
         </Tooltip>
-        <Typography variant="h5">{`${userName}'s task list`}</Typography>
       </Box>
       <Menu
         anchorEl={anchorEl}
@@ -79,13 +92,13 @@ export const TaskListHeader: FC = () => {
         <Divider />
         <MenuItem>
           <ListItemIcon>
-            <Settings fontSize="small" />
+            <SettingsIcon fontSize="small" />
           </ListItemIcon>
           Settings
         </MenuItem>
         <MenuItem>
           <ListItemIcon>
-            <Logout fontSize="small" />
+            <LogoutIcon fontSize="small" />
           </ListItemIcon>
           Logout
         </MenuItem>

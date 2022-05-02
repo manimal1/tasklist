@@ -40,7 +40,7 @@ export const TaskListTable: FC<Props> = ({ taskList, dispatch, setIsFormOpen, se
     taskListApi.delete(taskId).then(() => dispatch({ type: Actions.DeleteTask, payload: { taskId } }));
 
   return (
-    <Box sx={{ maxHeight: '520px', overflow: 'auto', paddingBottom: '48px' }}>
+    <Box sx={{ maxHeight: '520px', overflow: 'auto', paddingBottom: '56px' }}>
       {tasks.map((task) => (
         <Fragment key={task.id}>
           <TaskListTableRow task={task} toggleCompleted={toggleCompleted} editTask={editTask} deleteTask={deleteTask} />

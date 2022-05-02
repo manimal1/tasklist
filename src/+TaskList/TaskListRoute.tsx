@@ -74,7 +74,7 @@ export const TaskListRoute: FC = () => {
         sx={{
           position: 'absolute',
           bottom: '0',
-          right: '0',
+          right: '6px',
           backgroundColor: 'white',
           zIndex: '10',
         }}
