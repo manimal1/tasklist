@@ -65,12 +65,18 @@ export const TaskForm: FC<Props> = ({ task, taskListCount, isFormOpen, dispatch,
   const renderLabel = () => (task ? 'Edit task' : 'Create task');
   const renderButtonLabel = () => (task ? 'Update' : 'Create');
 
+  const boxWrapperStyles = {
+    padding: '32px',
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  };
+
   return (
     <Drawer anchor="bottom" open={isFormOpen} onClose={handleClose} variant="temporary">
       <form onSubmit={handleSubmitTask}>
-        <Box
-          sx={{ padding: '32px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', flexWrap: 'wrap' }}
-        >
+        <Box sx={boxWrapperStyles}>
           <TextField
             label={renderLabel()}
             value={title}

@@ -58,6 +58,14 @@ export const TaskListRoute: FC = () => {
     setIsFormOpen(!isFormOpen);
   };
 
+  const addIconStyles = {
+    position: 'absolute',
+    bottom: '0',
+    right: '6px',
+    backgroundColor: 'white',
+    zIndex: '10',
+  };
+
   return (
     <TasklistCard>
       <TaskListHeader />
@@ -68,17 +76,7 @@ export const TaskListRoute: FC = () => {
         setTaskInEdit={setTaskInEdit}
         setIsFormOpen={setIsFormOpen}
       />
-      <IconButton
-        onClick={toggleDrawer}
-        color="primary"
-        sx={{
-          position: 'absolute',
-          bottom: '0',
-          right: '6px',
-          backgroundColor: 'white',
-          zIndex: '10',
-        }}
-      >
+      <IconButton onClick={toggleDrawer} color="primary" sx={addIconStyles}>
         <AddIcon fontSize="large" />
       </IconButton>
       <TaskForm

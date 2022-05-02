@@ -12,17 +12,17 @@ interface Props {
   deleteTask: (taskId: string) => void;
 }
 
+const boxWrapperStyles = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  minHeight: '48px',
+  borderBottom: '1px solid grey',
+  padding: '8px 12px',
+};
+
 export const TaskListTableRow: FC<Props> = ({ task, toggleCompleted, editTask, deleteTask }) => (
-  <Box
-    sx={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      minHeight: '48px',
-      borderBottom: '1px solid grey',
-      padding: '8px 12px',
-    }}
-  >
+  <Box sx={boxWrapperStyles}>
     <Box sx={{ display: 'flex', alignItems: 'center', flex: '1' }}>
       <Checkbox checked={task.is_complete} onClick={(event: SyntheticEvent) => toggleCompleted(event, task)} />
       <Typography variant="body1" sx={{ textDecoration: task.is_complete ? 'line-through' : 'none' }}>
